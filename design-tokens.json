@@ -2,11 +2,11 @@
   "color": {
     "additional palette/yellow/yellow-5": {
       "$type": "color",
-      "$value": "#fffcf5"
+      "$value": "#fffff5"
     },
     "additional palette/yellow/yellow-10": {
       "$type": "color",
-      "$value": "#fffse5"
+      "$value": "#ffffe5"
     },
     "additional palette/yellow/yellow-20": {
       "$type": "color",
