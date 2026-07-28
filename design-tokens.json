@@ -192,6 +192,10 @@
       "$type": "color",
       "$value": "#236e4a"
     },
+    "Theme/Loveship-Light/palette-additional/yellow/yellow-5": {
+      "$type": "color",
+      "$value": "#ffdff5"
+    },
     "Theme/Loveship-Light/palette/white": {
       "$type": "color",
       "$value": "#ffffff"
@@ -771,10 +775,6 @@
     "Theme/Electric-Dark/palette/fire/fire-70": {
       "$type": "color",
       "$value": "#fc9797"
-    },
-    "Theme/Loveship-Light/palette-additional/yellow/yellow-5": {
-      "$type": "color",
-      "$value": "#ffdff5"
     },
     "Theme/Loveship-Dark/palette-additional/yellow/yellow-5": {
       "$type": "color",
