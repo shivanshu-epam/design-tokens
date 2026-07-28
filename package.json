@@ -1,0 +1,35 @@
+{
+  "name": "design-tokens",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "description": "Design tokens synced from Figma via the Design Sync plugin, documented in Storybook.",
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "postbuild-storybook": "node scripts/record-sync-marker.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shivanshu-epam/design-tokens.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shivanshu-epam/design-tokens/issues"
+  },
+  "homepage": "https://github.com/shivanshu-epam/design-tokens#readme",
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@storybook/react-vite": "^10.5.5",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "storybook": "^10.5.5",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.5"
+  }
+}
