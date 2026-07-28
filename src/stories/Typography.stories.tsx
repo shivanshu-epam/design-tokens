@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { CSSProperties } from 'react';
-import { groupBySection, tokens } from '../tokens';
+import { useState, type CSSProperties } from 'react';
+import { CollapsibleGroup, SearchBox, useFilteredGroups } from '../components/TokenBrowser';
+import { tokens } from '../tokens';
 
 function fontWeight(fontStyle: string): number {
   if (/bold/i.test(fontStyle)) return 700;
@@ -10,12 +11,22 @@ function fontWeight(fontStyle: string): number {
 }
 
 function TypeScale() {
-  const groups = groupBySection(tokens.typography);
+  const [query, setQuery] = useState('');
+  const groups = useFilteredGroups(tokens.typography, query);
+  const resultCount = Array.from(groups.values()).reduce((n, g) => n + g.length, 0);
+  const hasQuery = query.trim().length > 0;
+
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif' }}>
+      <SearchBox
+        value={query}
+        onChange={setQuery}
+        placeholder="Filter typography (e.g. button, accent)…"
+        resultCount={resultCount}
+        totalCount={Object.keys(tokens.typography).length}
+      />
       {Array.from(groups.entries()).map(([section, entries]) => (
-        <section key={section} style={{ marginBottom: 32 }}>
-          <h2 style={{ fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#666' }}>{section}</h2>
+        <CollapsibleGroup key={section} title={section} count={entries.length} forceOpen={hasQuery}>
           {entries.map(({ key, label, value }) => {
             const v = value.$value;
             const sampleStyle: CSSProperties = {
@@ -38,7 +49,7 @@ function TypeScale() {
               </div>
             );
           })}
-        </section>
+        </CollapsibleGroup>
       ))}
     </div>
   );

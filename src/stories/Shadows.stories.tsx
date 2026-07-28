@@ -1,13 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { groupBySection, shadowCss, tokens } from '../tokens';
+import { useState } from 'react';
+import { CollapsibleGroup, SearchBox, useFilteredGroups } from '../components/TokenBrowser';
+import { shadowCss, tokens } from '../tokens';
 
 function Shadows() {
-  const groups = groupBySection(tokens.shadow);
+  const [query, setQuery] = useState('');
+  const groups = useFilteredGroups(tokens.shadow, query);
+  const resultCount = Array.from(groups.values()).reduce((n, g) => n + g.length, 0);
+  const hasQuery = query.trim().length > 0;
+
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif' }}>
+      <SearchBox
+        value={query}
+        onChange={setQuery}
+        placeholder="Filter shadows…"
+        resultCount={resultCount}
+        totalCount={Object.keys(tokens.shadow).length}
+      />
       {Array.from(groups.entries()).map(([section, entries]) => (
-        <section key={section} style={{ marginBottom: 32 }}>
-          <h2 style={{ fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#666' }}>{section}</h2>
+        <CollapsibleGroup key={section} title={section} count={entries.length} forceOpen={hasQuery}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 32, paddingTop: 8 }}>
             {entries.map(({ key, label, value }) => (
               <div key={key} style={{ textAlign: 'center' }}>
@@ -25,7 +37,7 @@ function Shadows() {
               </div>
             ))}
           </div>
-        </section>
+        </CollapsibleGroup>
       ))}
     </div>
   );

@@ -53,19 +53,31 @@ export interface GroupedEntry<T> {
   value: T;
 }
 
-// Figma style names are slash-delimited paths (e.g.
-// "additional palette/cobalt/cobalt-50"). Group by the first segment so the
-// story pages read the same way the styles are organized in Figma.
+// Figma style/variable names are slash-delimited paths (e.g.
+// "additional palette/cobalt/cobalt-50", or for multi-mode variables
+// "Theme/Loveship-Dark/components/accordion/colors/accordion-bg-color").
+// Group by the first two segments when there are more than two — for
+// variable collections that's collection+mode, which keeps each group to a
+// browsable size instead of one multi-thousand-entry blob per collection.
 export function groupBySection<T>(record: Record<string, T>): Map<string, GroupedEntry<T>[]> {
   const groups = new Map<string, GroupedEntry<T>[]>();
   for (const key of Object.keys(record).sort()) {
-    const [section, ...rest] = key.split('/');
+    const segments = key.split('/');
+    const depth = segments.length > 2 ? 2 : 1;
+    const section = segments.slice(0, depth).join('/');
+    const rest = segments.slice(depth);
     const label = rest.length > 0 ? rest.join(' / ') : section;
     const list = groups.get(section) ?? [];
     list.push({ key, label, value: record[key] });
     groups.set(section, list);
   }
   return groups;
+}
+
+export function filterByQuery<T>(record: Record<string, T>, query: string): Record<string, T> {
+  const q = query.trim().toLowerCase();
+  if (!q) return record;
+  return Object.fromEntries(Object.entries(record).filter(([key]) => key.toLowerCase().includes(q)));
 }
 
 export function shadowCss(layers: ShadowLayer[]): string {

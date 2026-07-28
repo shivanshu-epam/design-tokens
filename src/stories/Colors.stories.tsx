@@ -1,13 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { groupBySection, tokens } from '../tokens';
+import { useState } from 'react';
+import { CollapsibleGroup, SearchBox, useFilteredGroups } from '../components/TokenBrowser';
+import { tokens } from '../tokens';
 
 function ColorPalette() {
-  const groups = groupBySection(tokens.color);
+  const [query, setQuery] = useState('');
+  const groups = useFilteredGroups(tokens.color, query);
+  const resultCount = Array.from(groups.values()).reduce((n, g) => n + g.length, 0);
+  const hasQuery = query.trim().length > 0;
+
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif' }}>
+      <SearchBox
+        value={query}
+        onChange={setQuery}
+        placeholder="Filter colors (e.g. Loveship-Dark, accordion, yellow)…"
+        resultCount={resultCount}
+        totalCount={Object.keys(tokens.color).length}
+      />
       {Array.from(groups.entries()).map(([section, entries]) => (
-        <section key={section} style={{ marginBottom: 32 }}>
-          <h2 style={{ fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#666' }}>{section}</h2>
+        <CollapsibleGroup key={section} title={section} count={entries.length} forceOpen={hasQuery}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
             {entries.map(({ key, label, value }) => (
               <div key={key}>
@@ -17,7 +29,7 @@ function ColorPalette() {
               </div>
             ))}
           </div>
-        </section>
+        </CollapsibleGroup>
       ))}
     </div>
   );
