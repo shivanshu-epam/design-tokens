@@ -234,7 +234,7 @@
     },
     "Theme/Loveship-Light/palette/night/night100": {
       "$type": "color",
-      "$value": "#f5f6fa"
+      "$value": "#f5fdfa"
     },
     "Theme/Loveship-Dark/palette/night/night100": {
       "$type": "color",
