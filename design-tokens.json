@@ -18,11 +18,11 @@
     },
     "additional palette/yellow/yellow-60": {
       "$type": "color",
-      "$value": "#effe02"
+      "$value": "#edbe02"
     },
     "additional palette/yellow/yellow-70": {
       "$type": "color",
-      "$value": "#beee02"
+      "$value": "#bc7e02"
     },
     "additional palette/orange/orange-5": {
       "$type": "color",
