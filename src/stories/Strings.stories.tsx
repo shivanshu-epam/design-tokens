@@ -3,37 +3,38 @@ import { useState } from 'react';
 import { CollapsibleGroup, SearchBox, useFilteredGroups } from '../components/TokenBrowser';
 import { describeToken, tokens } from '../tokens';
 
-function Dimensions() {
+// New in Phase 1 — Figma STRING variables (font family names, icon keys,
+// etc.) weren't read at all before; see PROJECT.md / the roadmap doc.
+function Strings() {
   const [query, setQuery] = useState('');
-  const groups = useFilteredGroups(tokens.dimension, query);
+  const groups = useFilteredGroups(tokens.string, query);
   const resultCount = Array.from(groups.values()).reduce((n, g) => n + g.length, 0);
   const hasQuery = query.trim().length > 0;
+
+  if (Object.keys(tokens.string).length === 0) {
+    return <p style={{ fontFamily: 'system-ui, sans-serif', color: '#888', fontSize: 13 }}>No string tokens synced yet.</p>;
+  }
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif' }}>
       <SearchBox
         value={query}
         onChange={setQuery}
-        placeholder="Filter dimensions (e.g. border-radius, spacing)…"
+        placeholder="Filter string tokens…"
         resultCount={resultCount}
-        totalCount={Object.keys(tokens.dimension).length}
+        totalCount={Object.keys(tokens.string).length}
       />
       {Array.from(groups.entries()).map(([section, entries]) => (
         <CollapsibleGroup key={section} title={section} count={entries.length} forceOpen={hasQuery}>
           {entries.map(({ key, label, value }) => {
-            const { resolved, isReference, refKey, error } = describeToken('dimension', key, value);
-            const px = resolved ? parseFloat(resolved) : NaN;
-            const barWidth = Number.isFinite(px) ? Math.min(Math.max(px, 1), 200) : 0;
+            const { resolved, isReference, refKey, error } = describeToken('string', key, value);
             return (
               <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '6px 0', borderBottom: '1px solid #eee' }}>
                 <div style={{ width: 260, flexShrink: 0, fontSize: 12, color: '#333' }}>
                   {label}
                   {isReference && <span style={{ marginLeft: 6, fontSize: 9, color: '#888' }}>REF</span>}
                 </div>
-                <div style={{ width: 210, flexShrink: 0 }}>
-                  {barWidth > 0 && <div style={{ height: 8, width: barWidth, borderRadius: 2, background: '#6366f1' }} />}
-                </div>
-                <div style={{ fontSize: 11, color: error ? '#c00' : '#888', fontFamily: 'ui-monospace, monospace' }}>
+                <div style={{ fontSize: 12, color: error ? '#c00' : '#333' }}>
                   {error ? `⚠ ${error}` : isReference ? `→ ${refKey} (${resolved})` : resolved}
                 </div>
               </div>
@@ -45,11 +46,11 @@ function Dimensions() {
   );
 }
 
-const meta: Meta<typeof Dimensions> = {
-  title: 'Design Tokens/Dimensions',
-  component: Dimensions,
+const meta: Meta<typeof Strings> = {
+  title: 'Design Tokens/Strings',
+  component: Strings,
 };
 export default meta;
 
-type Story = StoryObj<typeof Dimensions>;
-export const Scale: Story = {};
+type Story = StoryObj<typeof Strings>;
+export const Values: Story = {};

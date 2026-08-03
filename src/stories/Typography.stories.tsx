@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, type CSSProperties } from 'react';
 import { CollapsibleGroup, SearchBox, useFilteredGroups } from '../components/TokenBrowser';
-import { tokens } from '../tokens';
+import { describeToken, tokens } from '../tokens';
 
 function fontWeight(fontStyle: string): number {
   if (/bold/i.test(fontStyle)) return 700;
@@ -28,7 +28,14 @@ function TypeScale() {
       {Array.from(groups.entries()).map(([section, entries]) => (
         <CollapsibleGroup key={section} title={section} count={entries.length} forceOpen={hasQuery}>
           {entries.map(({ key, label, value }) => {
-            const v = value.$value;
+            const { resolved: v, isReference, refKey, error } = describeToken('typography', key, value);
+            if (!v) {
+              return (
+                <div key={key} style={{ padding: '10px 0', borderBottom: '1px solid #eee', fontSize: 11, color: '#c00' }}>
+                  {label}: ⚠ {error}
+                </div>
+              );
+            }
             const sampleStyle: CSSProperties = {
               fontFamily: v.fontFamily,
               fontSize: Math.min(v.fontSize, 40),
@@ -40,7 +47,10 @@ function TypeScale() {
             return (
               <div key={key} style={{ display: 'flex', alignItems: 'baseline', gap: 16, padding: '10px 0', borderBottom: '1px solid #eee' }}>
                 <div style={{ width: 220, flexShrink: 0, fontSize: 12, color: '#888' }}>
-                  <div style={{ fontWeight: 600, color: '#333' }}>{label}</div>
+                  <div style={{ fontWeight: 600, color: '#333' }}>
+                    {label}
+                    {isReference && <span style={{ marginLeft: 6, fontSize: 9, color: '#888', fontWeight: 400 }}>REF → {refKey}</span>}
+                  </div>
                   <div style={{ fontSize: 10, marginTop: 2 }}>
                     {v.fontSize}px / {lineHeight} · {v.fontStyle}
                   </div>

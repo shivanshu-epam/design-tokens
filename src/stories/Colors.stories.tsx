@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { CollapsibleGroup, SearchBox, useFilteredGroups } from '../components/TokenBrowser';
-import { tokens } from '../tokens';
+import { describeToken, tokens } from '../tokens';
 
 function ColorPalette() {
   const [query, setQuery] = useState('');
@@ -21,13 +21,31 @@ function ColorPalette() {
       {Array.from(groups.entries()).map(([section, entries]) => (
         <CollapsibleGroup key={section} title={section} count={entries.length} forceOpen={hasQuery}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
-            {entries.map(({ key, label, value }) => (
-              <div key={key}>
-                <div style={{ height: 64, borderRadius: 6, border: '1px solid #ddd', background: value.$value }} />
-                <div style={{ fontSize: 12, marginTop: 6, fontWeight: 600 }}>{label}</div>
-                <div style={{ fontSize: 11, color: '#888', fontFamily: 'ui-monospace, monospace' }}>{value.$value}</div>
-              </div>
-            ))}
+            {entries.map(({ key, label, value }) => {
+              const { resolved, isReference, refKey, error } = describeToken('color', key, value);
+              return (
+                <div key={key}>
+                  <div
+                    style={{
+                      height: 64,
+                      borderRadius: 6,
+                      border: '1px solid #ddd',
+                      background: resolved ?? '#fff',
+                      backgroundImage: error
+                        ? 'repeating-linear-gradient(45deg, #f88 0, #f88 6px, #fff 6px, #fff 12px)'
+                        : undefined,
+                    }}
+                  />
+                  <div style={{ fontSize: 12, marginTop: 6, fontWeight: 600 }}>
+                    {label}
+                    {isReference && <span style={{ marginLeft: 6, fontSize: 9, color: '#888', fontWeight: 400 }}>REF</span>}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#888', fontFamily: 'ui-monospace, monospace' }}>
+                    {error ? `⚠ ${error}` : isReference ? `→ ${refKey} (${resolved})` : resolved}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </CollapsibleGroup>
       ))}
