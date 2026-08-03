@@ -48938,8 +48938,8 @@
     "Theme/Loveship-Light/core/neutral/neutral-95": {
       "$type": "color",
       "$value": {
-        "kind": "reference",
-        "refKey": "color/Theme/Loveship-Light/utilities/undefined-color"
+        "kind": "value",
+        "value": "#ffffff00"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
@@ -48949,8 +48949,8 @@
     "Theme/Loveship-Dark/core/neutral/neutral-95": {
       "$type": "color",
       "$value": {
-        "kind": "reference",
-        "refKey": "color/Theme/Loveship-Dark/utilities/undefined-color"
+        "kind": "value",
+        "value": "#ffffff00"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
@@ -48960,8 +48960,8 @@
     "Theme/Promo/core/neutral/neutral-95": {
       "$type": "color",
       "$value": {
-        "kind": "reference",
-        "refKey": "color/Theme/Promo/utilities/undefined-color"
+        "kind": "value",
+        "value": "#ffffff00"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
@@ -54339,8 +54339,8 @@
     "Theme/Loveship-Dark/components/badge/colors/badge-warning/count_indicator-caption": {
       "$type": "color",
       "$value": {
-        "kind": "reference",
-        "refKey": "color/Theme/Loveship-Dark/core/internal/warning-contrast"
+        "kind": "value",
+        "value": "#303240"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
