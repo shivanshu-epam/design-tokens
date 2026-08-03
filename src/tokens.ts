@@ -1,61 +1,16 @@
 // Typed access to design-tokens.json (kept at the repo root — this is the
 // same file the Design Sync Figma plugin reads from and commits to), plus
-// small helpers shared by the token story pages.
+// small helpers used by the token story pages.
 //
-// Phase 1 schema: `$value` wraps either a concrete value or a *reference*
-// to another token (`{ kind: 'reference', refKey: '<category>/<key>' }`)
-// instead of every alias being flattened away at sync time. Mirrors
-// shared/tokens.ts in the plugin repo — reimplemented here since this repo
-// has no shared module with the plugin (see PROJECT.md, §3: the two repos
-// only ever talk through this JSON file).
+// The token schema and reference-resolution logic (TokenSet, DesignToken,
+// resolveToken, ...) used to be reimplemented here, hand-duplicated from
+// the plugin's shared/tokens.ts. It now lives in one place — the
+// `design-sync-schema` package, imported by both repos — so a fix to
+// resolution/validation logic only has to happen once.
 import raw from '../design-tokens.json';
+import { resolveToken as resolveTokenInSet, type DesignToken, type ShadowLayer, type TokenCategory, type TokenSet } from 'design-sync-schema';
 
-export type TokenCategory = 'color' | 'typography' | 'shadow' | 'dimension' | 'string' | 'boolean';
-
-export type TokenValue<T> = { kind: 'value'; value: T } | { kind: 'reference'; refKey: string };
-
-export interface DesignToken<T> {
-  $type: TokenCategory;
-  $value: TokenValue<T>;
-  $description?: string;
-  $extensions?: {
-    'design-sync.figmaSourceType'?: 'style' | 'variable';
-    'design-sync.variableId'?: string;
-  };
-}
-
-export interface TypographyValue {
-  fontFamily: string;
-  fontStyle: string;
-  fontSize: number;
-  lineHeight: { value: number; unit: 'PIXELS' | 'PERCENT' | 'AUTO' };
-  letterSpacing: { value: number; unit: 'PIXELS' | 'PERCENT' };
-}
-
-export interface ShadowLayer {
-  type: 'DROP_SHADOW' | 'INNER_SHADOW';
-  color: string;
-  offsetX: number;
-  offsetY: number;
-  blur: number;
-  spread: number;
-}
-
-export type ColorToken = DesignToken<string>;
-export type TypographyToken = DesignToken<TypographyValue>;
-export type ShadowToken = DesignToken<ShadowLayer[]>;
-export type DimensionToken = DesignToken<string>;
-export type StringToken = DesignToken<string>;
-export type BooleanToken = DesignToken<boolean>;
-
-export interface TokenSet {
-  color: Record<string, ColorToken>;
-  typography: Record<string, TypographyToken>;
-  shadow: Record<string, ShadowToken>;
-  dimension: Record<string, DimensionToken>;
-  string: Record<string, StringToken>;
-  boolean: Record<string, BooleanToken>;
-}
+export type { TokenCategory, TokenSet, DesignToken, ShadowLayer } from 'design-sync-schema';
 
 const parsed = raw as unknown as Partial<TokenSet>;
 export const tokens: TokenSet = {
@@ -67,27 +22,13 @@ export const tokens: TokenSet = {
   boolean: parsed.boolean ?? {},
 };
 
-export function parseRefKey(refKey: string): { category: TokenCategory; key: string } {
-  const idx = refKey.indexOf('/');
-  if (idx === -1) throw new Error(`Malformed token reference: ${refKey}`);
-  return { category: refKey.slice(0, idx) as TokenCategory, key: refKey.slice(idx + 1) };
-}
-
-export function resolveToken<T>(
-  key: string,
-  category: TokenCategory,
-  set: TokenSet = tokens,
-  visited: Set<string> = new Set(),
-): T {
-  const visitKey = `${category}/${key}`;
-  if (visited.has(visitKey)) throw new Error(`Circular token reference at ${visitKey}`);
-  visited.add(visitKey);
-  const bucket = set[category] as Record<string, DesignToken<T>>;
-  const token = bucket[key];
-  if (!token) throw new Error(`Token not found: ${visitKey}`);
-  if (token.$value.kind === 'value') return token.$value.value;
-  const ref = parseRefKey(token.$value.refKey);
-  return resolveToken<T>(ref.key, ref.category, set, visited);
+// Convenience wrapper: every call site in this repo resolves against the
+// one `tokens` singleton loaded above, so the shared `resolveToken` (which
+// takes an explicit set, since the plugin resolves against Figma- or
+// GitHub-side data that isn't a fixed singleton) doesn't need that param
+// repeated everywhere here.
+export function resolveToken<T>(key: string, category: TokenCategory, set: TokenSet = tokens): T {
+  return resolveTokenInSet<T>(key, category, set);
 }
 
 // What every story page actually needs to render one row: the resolved

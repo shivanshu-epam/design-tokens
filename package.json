@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/shivanshu-epam/design-tokens#readme",
   "dependencies": {
+    "design-sync-schema": "github:shivanshu-epam/Atlassian-design-system#main",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
