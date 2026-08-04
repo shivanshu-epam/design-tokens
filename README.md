@@ -48,8 +48,13 @@ to render thousands of entries at once).
 the git blob SHA of `design-tokens.json` at build time. That's how the
 Figma plugin's Status tab knows whether the last Storybook build actually
 reflects what's currently on GitHub, without needing a live Storybook
-deployment to check against — **remember to run `build-storybook` and
-push after any token change**, or Storybook will read as stale there.
+deployment to check against.
+
+This is automated: `.github/workflows/deploy-storybook.yml` runs on every
+push to `main`, rebuilds Storybook, deploys it to GitHub Pages, and commits
+the refreshed `.storybook-sync.json` back to the repo — no manual build/push
+step needed after a token change. (One-time setup: repo Settings → Pages →
+Source must be set to "GitHub Actions" for the deploy to publish.)
 
 ## Scale
 
