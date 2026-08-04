@@ -1,0 +1,23 @@
+name: Notify on token sync
+
+on:
+  push:
+    branches: [main]
+    paths: ['.design-sync/audit-log.jsonl']
+  workflow_dispatch: {} # triggered by the Figma plugin's "Send test notification" button
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # need the previous commit to diff audit-log.jsonl's new lines
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/notify-on-sync.mjs
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
