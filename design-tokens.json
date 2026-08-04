@@ -484,7 +484,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#ffffff"
+        "value": "#fffff5"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
@@ -141194,18 +141194,6 @@
     }
   },
   "string": {
-    "Theme/Loveship-Light/core/typography/promo-headlines/PH1/PH1-font": {
-      "$type": "string",
-      "$value": {
-        "kind": "reference",
-        "refKey": "string/Theme/Loveship-Light/core/typography/promo-headlines/promo-headline-font"
-      },
-      "$extensions": {
-        "design-sync.figmaSourceType": "variable",
-        "design-sync.variableId": "VariableID:57039:195897",
-        "design-sync.modeId": "25178:0"
-      }
-    },
     "Theme/Loveship-Light/core/typography/headlines/headline-font": {
       "$type": "string",
       "$value": {
@@ -141564,6 +141552,18 @@
         "design-sync.figmaSourceType": "variable",
         "design-sync.variableId": "VariableID:57039:195889",
         "design-sync.modeId": "85894:0"
+      }
+    },
+    "Theme/Loveship-Light/core/typography/promo-headlines/PH1/PH1-font": {
+      "$type": "string",
+      "$value": {
+        "kind": "value",
+        "value": "Source Sans Pro"
+      },
+      "$extensions": {
+        "design-sync.figmaSourceType": "variable",
+        "design-sync.variableId": "VariableID:57039:195897",
+        "design-sync.modeId": "25178:0"
       }
     },
     "Theme/Loveship-Dark/core/typography/promo-headlines/PH1/PH1-font": {
