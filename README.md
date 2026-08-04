@@ -50,11 +50,16 @@ Figma plugin's Status tab knows whether the last Storybook build actually
 reflects what's currently on GitHub, without needing a live Storybook
 deployment to check against.
 
-This is automated: `.github/workflows/deploy-storybook.yml` runs on every
-push to `main`, rebuilds Storybook, deploys it to GitHub Pages, and commits
-the refreshed `.storybook-sync.json` back to the repo — no manual build/push
-step needed after a token change. (One-time setup: repo Settings → Pages →
-Source must be set to "GitHub Actions" for the deploy to publish.)
+This is scripted but not automatic: `.github/workflows/deploy-storybook.yml`
+rebuilds Storybook, deploys it to GitHub Pages, and commits the refreshed
+`.storybook-sync.json` back to the repo, but only runs when triggered —
+either from the Figma plugin's Status tab (a "Rebuild Storybook" button
+appears once it detects GitHub is ahead of the last build) or manually via
+`workflow_dispatch` in the Actions tab / `gh workflow run deploy-storybook.yml`.
+It intentionally does **not** run on every push — rebuilding is a deliberate
+action the user takes after reviewing what changed, not a side effect of
+every commit. (One-time setup: repo Settings → Pages → Source must be set
+to "GitHub Actions" for the deploy to publish.)
 
 ## Scale
 
