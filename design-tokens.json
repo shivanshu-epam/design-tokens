@@ -68832,18 +68832,6 @@
     }
   },
   "dimension": {
-    "Theme/Loveship-Light/components/text_input/fonts/text_input-l-(36)/font-size": {
-      "$type": "dimension",
-      "$value": {
-        "kind": "reference",
-        "refKey": "dimension/Theme/Loveship-Light/core/sizes/size-L-(36)/font-size"
-      },
-      "$extensions": {
-        "design-sync.figmaSourceType": "variable",
-        "design-sync.variableId": "VariableID:62172:169888",
-        "design-sync.modeId": "25178:0"
-      }
-    },
     "Theme/Loveship-Light/core/sizes/border-radius-3": {
       "$type": "dimension",
       "$value": {
@@ -112462,6 +112450,18 @@
         "design-sync.figmaSourceType": "variable",
         "design-sync.variableId": "VariableID:62172:169885",
         "design-sync.modeId": "85894:0"
+      }
+    },
+    "Theme/Loveship-Light/components/text_input/fonts/text_input-l-(36)/font-size": {
+      "$type": "dimension",
+      "$value": {
+        "kind": "value",
+        "value": "14px"
+      },
+      "$extensions": {
+        "design-sync.figmaSourceType": "variable",
+        "design-sync.variableId": "VariableID:62172:169888",
+        "design-sync.modeId": "25178:0"
       }
     },
     "Theme/Loveship-Dark/components/text_input/fonts/text_input-l-(36)/font-size": {
