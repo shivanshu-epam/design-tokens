@@ -31,13 +31,6 @@ jobs:
             git commit -m "chore: update Storybook sync marker [skip ci]"
             git push
           fi
-      # Written into storybook-static/ so it ships as part of the SAME Pages
-      # deploy as Storybook itself — deploy-pages replaces the entire site
-      # on every run, so a status page generated in a separate workflow
-      # would silently wipe out the real Storybook content on its next
-      # deploy. This is exactly why it's tied to Storybook's own rebuild
-      # trigger rather than running on every sync.
-      - run: node scripts/generate-status-page.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
