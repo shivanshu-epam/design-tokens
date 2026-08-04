@@ -5,7 +5,8 @@
 //
 // Two trigger shapes, distinguished by GITHUB_EVENT_NAME:
 //   - push (path-filtered to audit-log.jsonl): posts one message per audit
-//     entry that's new since the previous commit.
+//     entry that's new since the previous commit, including the actual
+//     per-token before/after values.
 //   - workflow_dispatch (the plugin's "Send test notification" button):
 //     posts a single fixed test message, regardless of the log's content —
 //     this lets a team verify their webhook is wired up correctly without
@@ -19,7 +20,7 @@
 // it must already be a valid `{"type": "AdaptiveCard", ...}` object. Slack's
 // classic incoming webhook, by contrast, wants the plain `{"text": "..."}`
 // shape. There's no shape that satisfies both, so each provider gets its
-// own payload builder below.
+// own payload builder below, both fed by the same neutral `Summary` shape.
 import { execFileSync } from 'child_process';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -28,17 +29,48 @@ import path from 'path';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const AUDIT_LOG_PATH = path.join(root, '.design-sync', 'audit-log.jsonl');
 
-function teamsAdaptiveCard(text) {
-  return {
+// audit-log.jsonl stores each change's previousValue/newValue as the FULL
+// DesignToken object ({$type, $value: {kind, value|refKey}, $extensions}),
+// not a bare scalar — matches the shape sync-logic.ts's computeAuditChanges
+// actually writes. Extract just what's worth showing in a notification.
+function resolvedValueOf(token) {
+  if (token === undefined) return '—';
+  const v = token.$value;
+  if (!v) return JSON.stringify(token);
+  if (v.kind === 'reference') return `→ ${v.refKey}`;
+  return typeof v.value === 'string' ? v.value : JSON.stringify(v.value);
+}
+
+const MAX_CHANGE_LINES = 12;
+
+function changeLines(changes) {
+  const lines = changes
+    .slice(0, MAX_CHANGE_LINES)
+    .map((c) => `${c.category}/${c.key}: ${resolvedValueOf(c.previousValue)} → ${resolvedValueOf(c.newValue)}`);
+  if (changes.length > MAX_CHANGE_LINES) lines.push(`…and ${changes.length - MAX_CHANGE_LINES} more`);
+  return lines;
+}
+
+function teamsAdaptiveCard({ title, facts, lines, url, urlLabel }) {
+  const body = [{ type: 'TextBlock', text: title, weight: 'Bolder', size: 'Medium', wrap: true }];
+  if (facts.length > 0) body.push({ type: 'FactSet', facts: facts.map(([t, v]) => ({ title: t, value: v })) });
+  if (lines.length > 0) body.push({ type: 'TextBlock', text: lines.map((l) => `- ${l}`).join('\n\n'), wrap: true, isSubtle: true, size: 'Small' });
+  const card = {
     type: 'AdaptiveCard',
     $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
     version: '1.4',
-    body: [{ type: 'TextBlock', text, wrap: true }],
+    body,
   };
+  if (url) card.actions = [{ type: 'Action.OpenUrl', title: urlLabel ?? 'Open', url }];
+  return card;
 }
 
-function slackPayload(text) {
-  return { text };
+function slackPayload({ title, facts, lines, url, urlLabel }) {
+  const parts = [title];
+  if (facts.length > 0) parts.push(facts.map(([t, v]) => `${t}: ${v}`).join(' · '));
+  if (lines.length > 0) parts.push(lines.map((l) => `• ${l}`).join('\n'));
+  if (url) parts.push(`${urlLabel ?? 'Open'}: ${url}`);
+  return { text: parts.join('\n\n') };
 }
 
 async function post(url, payload) {
@@ -59,15 +91,29 @@ async function post(url, payload) {
   }
 }
 
-function formatEntry(entry) {
-  // Deliberately plain text, no markdown — Teams' Adaptive Card TextBlock
-  // and Slack's mrkdwn use two different, incompatible syntaxes for bold
-  // and links ([text](url) vs <url|text>), and this script has no way to
-  // know which provider(s) will actually receive a given message. Plain
-  // text renders identically and correctly on both.
+function summarizeEntry(entry) {
   const when = new Date(entry.timestamp).toLocaleString();
   const changeWord = entry.changes.length === 1 ? 'token' : 'tokens';
-  return `Design Sync: ${entry.actor} synced ${entry.changes.length} ${changeWord} — PR #${entry.prNumber}: ${entry.prUrl} (${when})`;
+  return {
+    title: `Design Sync: ${entry.actor} synced ${entry.changes.length} ${changeWord}`,
+    facts: [
+      ['Actor', entry.actor],
+      ['When', when],
+    ],
+    lines: changeLines(entry.changes),
+    url: entry.prUrl,
+    urlLabel: `View pull request #${entry.prNumber}`,
+  };
+}
+
+function testSummary() {
+  return {
+    title: '🔔 Design Sync test notification',
+    facts: [],
+    lines: ['Your integration is working.'],
+    url: undefined,
+    urlLabel: undefined,
+  };
 }
 
 async function main() {
@@ -78,9 +124,9 @@ async function main() {
     return;
   }
 
-  const messages = [];
+  const summaries = [];
   if (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch') {
-    messages.push('🔔 Design Sync test notification — your integration is working.');
+    summaries.push(testSummary());
   } else {
     // Compare against the previous commit's version of the file to isolate
     // just the entries this push added — audit-log.jsonl only ever grows,
@@ -103,18 +149,19 @@ async function main() {
     }
     for (const line of newLines) {
       try {
-        messages.push(formatEntry(JSON.parse(line)));
+        summaries.push(summarizeEntry(JSON.parse(line)));
       } catch (err) {
         console.error(`[notify-on-sync] Skipping unparseable audit log line: ${err instanceof Error ? err.message : String(err)}`);
       }
     }
   }
 
-  if (messages.length === 0) return;
-  const text = messages.join('\n\n');
-  if (teamsUrl) await post(teamsUrl, teamsAdaptiveCard(text));
-  if (slackUrl) await post(slackUrl, slackPayload(text));
-  console.log(`[notify-on-sync] Sent ${messages.length} message(s) to ${[teamsUrl && 'Teams', slackUrl && 'Slack'].filter(Boolean).join(' and ')}.`);
+  if (summaries.length === 0) return;
+  for (const summary of summaries) {
+    if (teamsUrl) await post(teamsUrl, teamsAdaptiveCard(summary));
+    if (slackUrl) await post(slackUrl, slackPayload(summary));
+  }
+  console.log(`[notify-on-sync] Sent ${summaries.length} message(s) to ${[teamsUrl && 'Teams', slackUrl && 'Slack'].filter(Boolean).join(' and ')}.`);
 }
 
 main().catch((err) => {
