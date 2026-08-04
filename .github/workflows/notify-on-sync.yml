@@ -21,3 +21,8 @@ jobs:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           GITHUB_EVENT_NAME: ${{ github.event_name }}
+          # Optional repo VARIABLE (not a secret) — an IANA zone name like
+          # "Asia/Kolkata", so notification timestamps show in a real
+          # timezone instead of this runner's UTC. Settings → Secrets and
+          # variables → Actions → Variables tab.
+          NOTIFY_TIMEZONE: ${{ vars.NOTIFY_TIMEZONE }}

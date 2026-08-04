@@ -91,8 +91,29 @@ async function post(url, payload) {
   }
 }
 
+// This script runs on a GitHub-hosted Actions runner, which is UTC —
+// new Date(...).toLocaleString() there uses the RUNNER's timezone, not the
+// reader's, so every notification showed a UTC timestamp with no timezone
+// label attached (read as "wrong" by anyone not in UTC). NOTIFY_TIMEZONE is
+// an optional repo variable (Settings → Secrets and variables → Actions →
+// Variables — not a secret, nothing sensitive about a timezone name) set to
+// an IANA zone like "Asia/Kolkata". Falls back to explicit labeled UTC
+// (unambiguous, at least, even if not local) when unset or invalid.
+function formatTimestamp(iso) {
+  const date = new Date(iso);
+  const tz = process.env.NOTIFY_TIMEZONE;
+  if (tz) {
+    try {
+      return `${new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: tz }).format(date)} (${tz})`;
+    } catch (err) {
+      console.error(`[notify-on-sync] Invalid NOTIFY_TIMEZONE "${tz}" (${err instanceof Error ? err.message : String(err)}) — falling back to UTC.`);
+    }
+  }
+  return `${date.toISOString().replace('T', ' ').slice(0, 16)} UTC`;
+}
+
 function summarizeEntry(entry) {
-  const when = new Date(entry.timestamp).toLocaleString();
+  const when = formatTimestamp(entry.timestamp);
   const changeWord = entry.changes.length === 1 ? 'token' : 'tokens';
   return {
     title: `Design Sync: ${entry.actor} synced ${entry.changes.length} ${changeWord}`,
