@@ -11,14 +11,15 @@
 //     this lets a team verify their webhook is wired up correctly without
 //     needing to run a real sync first.
 //
-// Both providers accept the same minimal `{ "text": "..." }` JSON body for
-// a plain-text message: that's Slack's classic incoming-webhook contract,
-// and it's also what Teams' Workflows app expects when the flow is created
-// from the built-in "Post to a channel when a webhook request is received"
-// template with its default "Text" field — see the plugin's Connect tab
-// for the exact setup steps. Keeping both providers on the same payload
-// shape means this script has no per-provider branching beyond "which URL
-// to POST to."
+// Teams and Slack need genuinely different payload shapes — found the hard
+// way via a real failed flow run (tracking error: "Property 'type' must be
+// 'AdaptiveCard'"). Microsoft's own "Post to a channel when a webhook
+// request is received" template doesn't extract a field from the request —
+// it treats the ENTIRE POSTed JSON body as the Adaptive Card to render, so
+// it must already be a valid `{"type": "AdaptiveCard", ...}` object. Slack's
+// classic incoming webhook, by contrast, wants the plain `{"text": "..."}`
+// shape. There's no shape that satisfies both, so each provider gets its
+// own payload builder below.
 import { execFileSync } from 'child_process';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -27,17 +28,33 @@ import path from 'path';
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const AUDIT_LOG_PATH = path.join(root, '.design-sync', 'audit-log.jsonl');
 
-async function postText(url, text) {
+function teamsAdaptiveCard(text) {
+  return {
+    type: 'AdaptiveCard',
+    $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+    version: '1.4',
+    body: [{ type: 'TextBlock', text, wrap: true }],
+  };
+}
+
+function slackPayload(text) {
+  return { text };
+}
+
+async function post(url, payload) {
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify(payload),
   });
   if (!res.ok) {
     // A webhook failure (revoked URL, flow deleted in Teams, etc.) shouldn't
     // fail the whole CI run — the sync itself already succeeded and merged;
     // losing a notification is a much smaller problem than a red check on
-    // an otherwise-fine PR.
+    // an otherwise-fine PR. Note: Teams' webhook trigger returns success as
+    // soon as it accepts the request, before the flow has actually run —
+    // a 2xx here does NOT guarantee the message posted; check the flow's
+    // own run history in Power Automate to confirm delivery.
     console.error(`[notify-on-sync] POST to ${url.replace(/\/[^/]+$/, '/…')} failed: ${res.status} ${res.statusText}`);
   }
 }
@@ -95,8 +112,8 @@ async function main() {
 
   if (messages.length === 0) return;
   const text = messages.join('\n\n');
-  if (teamsUrl) await postText(teamsUrl, text);
-  if (slackUrl) await postText(slackUrl, text);
+  if (teamsUrl) await post(teamsUrl, teamsAdaptiveCard(text));
+  if (slackUrl) await post(slackUrl, slackPayload(text));
   console.log(`[notify-on-sync] Sent ${messages.length} message(s) to ${[teamsUrl && 'Teams', slackUrl && 'Slack'].filter(Boolean).join(' and ')}.`);
 }
 
