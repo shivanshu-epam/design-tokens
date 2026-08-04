@@ -24,7 +24,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#ffffff"
+        "value": "#fffca4"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "style"
@@ -2344,7 +2344,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#ffffff"
+        "value": "#fffca4"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
@@ -2368,7 +2368,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "ffffff"
+        "value": "#fffca4"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
@@ -2380,7 +2380,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#ffffff"
+        "value": "#ffff0f"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
