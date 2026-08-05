@@ -1,0 +1,57 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design Tokens/Introduction" />
+
+# Design Tokens
+
+This is the live documentation for every design token synced from Figma via the
+[Design Sync plugin](https://github.com/shivanshu-epam/design-sync-plugin) into
+[`design-tokens.json`](https://github.com/shivanshu-epam/design-tokens/blob/main/design-tokens.json)
+in this repo. It's generated straight from that file — nothing here is hand-maintained,
+so it's never out of sync with what the plugin last committed.
+
+## The six categories
+
+| Category | Figma source | Where |
+|---|---|---|
+| **Colors** | Paint styles + COLOR variables | *Design Tokens → Colors* |
+| **Typography** | Text styles | *Design Tokens → Typography* |
+| **Shadows** | Effect styles (drop/inner shadow layers) | *Design Tokens → Shadows* |
+| **Dimensions** | Custom Tokens tab (Figma plugin) + FLOAT variables | *Design Tokens → Dimensions* |
+| **Strings** | STRING variables | *Design Tokens → Strings* |
+| **Booleans** | BOOLEAN variables | *Design Tokens → Booleans* |
+
+## How to read a token entry
+
+- **`REF`** next to a name means the token is an *alias* — its value is a pointer to
+  another token, not a value of its own. The line underneath shows the full chain it
+  resolves through (e.g. `button/button-bg → semantic/brand-primary → #3678e2`), not
+  just the immediate hop.
+- **`STYLE`** / **`VARIABLE`** shows which Figma primitive the token came from —
+  relevant if you're deciding whether editing it in Figma will update in place
+  (Variables) or needs a new Style.
+- A **hatched/dashed swatch** with a warning means the token's reference is broken or
+  circular — that's a data problem in the source token set, not a rendering bug here.
+
+## Grouping
+
+Sections are generated from the token's own name (a `/`-delimited path, e.g.
+`Theme/Loveship-Dark/components/button/colors/button-bg`) — collapsed adaptively, not at
+a fixed depth: a folder flattens into one browsable list once it has 40 or fewer
+entries in it; above that, it splits into sub-groups. Use the search box at the top of
+each category page to filter by name across every level at once.
+
+## Brand / mode preview
+
+The toolbar's theme control (top of the page, next to the viewport size icon) switches
+the canvas background between this design system's five brand+mode variants
+(Loveship Light/Dark, Promo, Electric Light/Dark) — useful when checking a token that's
+meant to sit on a dark surface, since swatches otherwise render on a fixed background
+regardless of which mode they belong to.
+
+## Where this comes from
+
+Nothing on this page is editable — it's a read-only view of `design-tokens.json`.
+To change a token, edit it in Figma and run a sync from the Design Sync plugin's
+**Sync** tab; that opens a pull request here, and this Storybook picks up the change
+the next time it's rebuilt (automatic on merge, via this repo's `deploy-storybook.yml`).

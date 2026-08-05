@@ -1,12 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { CollapsibleGroup, SearchBox, useFilteredGroups } from '../components/TokenBrowser';
-import { describeToken, shadowCss, tokens } from '../tokens';
+import { SearchBox, TokenGroup, useFilteredTree } from '../components/TokenBrowser';
+import { countLeaves, describeToken, shadowCss, tokens } from '../tokens';
+
+function referenceChainText(chain: { key: string }[]): string {
+  return chain.map((hop) => hop.key).join(' → ');
+}
 
 function Shadows() {
   const [query, setQuery] = useState('');
-  const groups = useFilteredGroups(tokens.shadow, query);
-  const resultCount = Array.from(groups.values()).reduce((n, g) => n + g.length, 0);
+  const tree = useFilteredTree(tokens.shadow, query);
   const hasQuery = query.trim().length > 0;
 
   return (
@@ -15,17 +18,23 @@ function Shadows() {
         value={query}
         onChange={setQuery}
         placeholder="Filter shadows…"
-        resultCount={resultCount}
+        resultCount={countLeaves(tree)}
         totalCount={Object.keys(tokens.shadow).length}
       />
-      {Array.from(groups.entries()).map(([section, entries]) => (
-        <CollapsibleGroup key={section} title={section} count={entries.length} forceOpen={hasQuery}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 32, paddingTop: 8 }}>
+      <TokenGroup
+        node={tree}
+        forceOpen={hasQuery}
+        renderLeaves={(entries) => (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 32, paddingTop: 8, paddingBottom: 8 }}>
             {entries.map(({ key, label, value }) => {
-              const { resolved, isReference, error } = describeToken('shadow', key, value);
+              const { resolved, isReference, chain, description, sourceType, error } = describeToken('shadow', key, value);
+              const accessibleName = error ? `${label}, error: ${error}` : `${label} shadow`;
               return (
                 <div key={key} style={{ textAlign: 'center' }}>
                   <div
+                    role="img"
+                    aria-label={accessibleName}
+                    title={accessibleName}
                     style={{
                       height: 72,
                       width: '90%',
@@ -38,15 +47,21 @@ function Shadows() {
                   />
                   <div style={{ fontSize: 12, marginTop: 12, fontWeight: 600 }}>
                     {label}
-                    {isReference && <span style={{ marginLeft: 6, fontSize: 9, color: '#888', fontWeight: 400 }}>REF</span>}
+                    {isReference && (
+                      <span style={{ marginLeft: 6, fontSize: 9, color: '#888', fontWeight: 400 }}>REF → {referenceChainText(chain)}</span>
+                    )}
+                    {sourceType && (
+                      <span style={{ marginLeft: 6, fontSize: 9, color: '#6366f1', fontWeight: 400 }}>{sourceType.toUpperCase()}</span>
+                    )}
                   </div>
+                  {description && <div style={{ fontSize: 10, color: '#aaa', marginTop: 2 }}>{description}</div>}
                   {error && <div style={{ fontSize: 10, color: '#c00' }}>⚠ {error}</div>}
                 </div>
               );
             })}
           </div>
-        </CollapsibleGroup>
-      ))}
+        )}
+      />
     </div>
   );
 }
@@ -54,6 +69,14 @@ function Shadows() {
 const meta: Meta<typeof Shadows> = {
   title: 'Design Tokens/Shadows',
   component: Shadows,
+  tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component: 'Every shadow token synced from Figma Effect styles (drop/inner shadow layers), rendered as a live box-shadow sample.',
+      },
+    },
+  },
 };
 export default meta;
 

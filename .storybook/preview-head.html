@@ -1,0 +1,18 @@
+<style>
+  /* Backing for the brand/mode toolbar control in preview.ts — a class on
+     <body>, set by @storybook/addon-themes' withThemeByClassName, picks
+     which of these applies. Colors mirror the Figma plugin's own slate
+     palette (see the Figma-Github Sync repo's ui.template.html) for visual
+     consistency between the two surfaces documenting the same tokens. */
+  body.theme-loveship-dark,
+  body.theme-electric-dark {
+    background: #0f172a !important;
+    color: #f8fafc;
+  }
+  body.theme-loveship-light,
+  body.theme-electric-light,
+  body.theme-promo {
+    background: #f8fafc !important;
+    color: #0f172a;
+  }
+</style>
