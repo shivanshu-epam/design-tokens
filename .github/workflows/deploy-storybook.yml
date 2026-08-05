@@ -22,15 +22,6 @@ jobs:
           node-version: '22'
       - run: npm ci
       - run: npm run build-storybook
-      - name: Commit updated sync marker
-        run: |
-          if ! git diff --quiet -- .storybook-sync.json; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add .storybook-sync.json
-            git commit -m "chore: update Storybook sync marker [skip ci]"
-            git push
-          fi
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -45,3 +36,25 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+      # Only reachable once deploy-pages above has actually succeeded — the
+      # marker is meant to mean "live on Pages," not just "an artifact was
+      # built," so it's recorded here, not in the build job. See
+      # scripts/record-sync-marker.mjs's header comment for the bug this
+      # used to cause (Status tab reading "in sync" from CI's validate-only
+      # build, which never deploys anywhere).
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm run record-sync-marker
+      - name: Commit updated sync marker
+        run: |
+          if ! git diff --quiet -- .storybook-sync.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add .storybook-sync.json
+            git commit -m "chore: update Storybook sync marker [skip ci]"
+            git push
+          fi

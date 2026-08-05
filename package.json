@@ -7,7 +7,7 @@
   "scripts": {
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "postbuild-storybook": "node scripts/record-sync-marker.mjs"
+    "record-sync-marker": "node scripts/record-sync-marker.mjs"
   },
   "repository": {
     "type": "git",

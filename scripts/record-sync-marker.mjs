@@ -1,6 +1,11 @@
 #!/usr/bin/env node
-// Runs automatically after `npm run build-storybook` (npm's implicit
-// postbuild-storybook hook). Stamps .storybook-sync.json with the git blob
+// Explicitly invoked by deploy-storybook.yml's `deploy` job, AFTER
+// actions/deploy-pages actually succeeds — not an automatic npm postbuild
+// hook. It used to be (named `postbuild-storybook`), which meant it fired
+// on every `npm run build-storybook` anywhere, including ci.yml's
+// validate-only build that never deploys — the Status tab would read
+// "in sync" and disable "Rebuild Storybook" even though nothing had ever
+// been published to Pages. Stamps .storybook-sync.json with the git blob
 // SHA of design-tokens.json at build time — `git hash-object` computes the
 // exact same SHA GitHub's Contents API reports for that file, so the Figma
 // plugin can tell whether Storybook was built from the tokens currently on
