@@ -1,0 +1,22 @@
+# Token gatekeeping — who must review a change before it can merge.
+#
+# GitHub only ENFORCES this once branch protection on `main` has "Require
+# review from Code Owners" turned on (Settings → Branches → main). Without
+# that setting, this file is documentation only — it won't block a merge
+# by itself. See the plugin's design-sync-roadmap doc, Phase 3's known
+# limitations, for why this line exists.
+#
+# Last match wins, so more specific paths further down override earlier
+# broader ones.
+
+# Default: any change in this repo needs at least one of these reviewers.
+* @shivanshu-epam
+
+# The actual source of truth — every sync PR touches this file. Route it
+# to whoever owns the design system, not just any repo contributor.
+/design-tokens.json @shivanshu-epam
+
+# CI/governance config — changing how validation or auto-merge policy
+# works is itself a change worth a second pair of eyes (ties into Phase 19,
+# the PR governance agent, once its policy file exists).
+/.github/ @shivanshu-epam
