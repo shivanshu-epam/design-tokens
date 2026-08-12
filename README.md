@@ -61,6 +61,16 @@ action the user takes after reviewing what changed, not a side effect of
 every commit. (One-time setup: repo Settings → Pages → Source must be set
 to "GitHub Actions" for the deploy to publish.)
 
+## JIRA-triggered token agent
+
+A JIRA ticket in the right format, moved to a specific status, gets picked up
+automatically — fetched, parsed, resolved against the real token file, and turned into
+a reviewed pull request. The ticket's own status tracks the PR's outcome (review →
+merged/live, or bounced back with a clarification comment if anything's ambiguous).
+Nothing here is ever auto-merged.
+
+Full architecture, setup, and troubleshooting notes: **[JIRA-AGENT.md](JIRA-AGENT.md)**.
+
 ## Scale
 
 At the time of writing this file has ~11,600 entries (~1.6MB) — EPAM UUI's
@@ -86,4 +96,9 @@ src/tokens.ts                typed access + grouping/filtering helpers
 src/components/TokenBrowser.tsx   shared search + collapsible-group UI
 src/stories/                 one story file per token category
 scripts/record-sync-marker.mjs    postbuild-storybook hook
+scripts/validate-tokens.mjs        schema + reference-cycle validator (CI + agent)
+scripts/jira-client.mjs            shared JIRA REST helper
+scripts/ticket-agent.mjs           JIRA ticket → PR pipeline (see JIRA-AGENT.md)
+scripts/ticket-agent-resolve.mjs   PR merge/close → JIRA status sync
+JIRA-AGENT.md                       full architecture + setup + troubleshooting
 ```
