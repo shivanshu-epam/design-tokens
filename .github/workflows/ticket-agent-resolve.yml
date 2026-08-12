@@ -1,0 +1,28 @@
+name: JIRA ticket agent — PR resolution
+
+# Companion to ticket-agent.yml: reports a PR opened by the agent back to
+# its originating JIRA ticket once the PR itself closes (merged or not).
+# See design-sync-roadmap-phases-1-11.md §25 (Phase 24).
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  resolve:
+    # Only PRs this agent itself opened carry this branch prefix — a
+    # human-authored PR closing should never touch a JIRA ticket status.
+    if: startsWith(github.event.pull_request.head.ref, 'design-sync/agent-')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/ticket-agent-resolve.mjs
+        env:
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}

@@ -1,0 +1,33 @@
+name: JIRA ticket agent
+
+# Fired by a JIRA Automation rule on the DS project (Work item transitioned
+# → "Ready for Agent"), which POSTs to /repos/.../dispatches with
+# event_type "jira-ticket-ready" and the issue key in client_payload.
+# See design-sync-roadmap-phases-1-11.md §25 (Phase 24) for the full spec.
+on:
+  repository_dispatch:
+    types: [jira-ticket-ready]
+
+# contents:write + pull-requests:write is all this needs — the workflow
+# runs inside this repo itself, so the automatically-provided GITHUB_TOKEN
+# (scoped to just this repo) is enough to push a branch and open a PR.
+# No GitHub App / separate bot credential required for this pass.
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  agent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/ticket-agent.mjs
+        env:
+          ISSUE_KEY: ${{ github.event.client_payload.issueKey }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
