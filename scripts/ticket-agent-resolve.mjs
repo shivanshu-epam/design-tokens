@@ -38,7 +38,12 @@ async function main() {
 
   if (PR_MERGED === 'true') {
     console.log(`[ticket-agent-resolve] ${prUrl} merged — transitioning ${issueKey} to Live.`);
-    await addComment(...jira, issueKey, `${prUrl} was merged — this change is live.`);
+    await addComment(
+      ...jira,
+      issueKey,
+      `${prUrl} was merged — this change is live in design-tokens.json. ` +
+        "It won't appear in the Figma file until someone opens the Design Sync plugin there and runs Fetch & compare — this repo has no way to push into Figma directly (that needs a Figma Enterprise plan's Variables API, which isn't in use here).",
+    );
     await transition(...jira, issueKey, 'Live');
   } else {
     console.log(`[ticket-agent-resolve] ${prUrl} closed without merging — bouncing ${issueKey} back to In Design.`);
