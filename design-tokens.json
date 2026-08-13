@@ -141198,7 +141198,7 @@
       "$type": "string",
       "$value": {
         "kind": "value",
-        "value": "Source Sans Pro"
+        "value": "Inter"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
