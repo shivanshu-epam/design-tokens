@@ -68860,7 +68860,7 @@
       "$type": "dimension",
       "$value": {
         "kind": "value",
-        "value": "2px"
+        "value": "0px"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
