@@ -4,7 +4,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#fffff0"
+        "value": "#fffff5"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "style"
@@ -74,7 +74,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#ffdcc2"
+        "value": "#ffe8d7"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "style"
@@ -94,7 +94,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#ff7a24"
+        "value": "#ff8b3e"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "style"
@@ -65541,6 +65541,66 @@
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
         "design-sync.variableId": "VariableID:85236:67216",
+        "design-sync.modeId": "85894:0"
+      }
+    },
+    "Theme/Loveship-Light/brand/custom": {
+      "$type": "color",
+      "$value": {
+        "kind": "value",
+        "value": "#123456"
+      },
+      "$extensions": {
+        "design-sync.figmaSourceType": "variable",
+        "design-sync.variableId": "VariableID:88751:15",
+        "design-sync.modeId": "25178:0"
+      }
+    },
+    "Theme/Loveship-Dark/brand/custom": {
+      "$type": "color",
+      "$value": {
+        "kind": "value",
+        "value": "#ffffff"
+      },
+      "$extensions": {
+        "design-sync.figmaSourceType": "variable",
+        "design-sync.variableId": "VariableID:88751:15",
+        "design-sync.modeId": "25178:1"
+      }
+    },
+    "Theme/Promo/brand/custom": {
+      "$type": "color",
+      "$value": {
+        "kind": "value",
+        "value": "#ffffff"
+      },
+      "$extensions": {
+        "design-sync.figmaSourceType": "variable",
+        "design-sync.variableId": "VariableID:88751:15",
+        "design-sync.modeId": "25178:2"
+      }
+    },
+    "Theme/Electric-Light/brand/custom": {
+      "$type": "color",
+      "$value": {
+        "kind": "value",
+        "value": "#ffffff"
+      },
+      "$extensions": {
+        "design-sync.figmaSourceType": "variable",
+        "design-sync.variableId": "VariableID:88751:15",
+        "design-sync.modeId": "26302:0"
+      }
+    },
+    "Theme/Electric-Dark/brand/custom": {
+      "$type": "color",
+      "$value": {
+        "kind": "value",
+        "value": "#ffffff"
+      },
+      "$extensions": {
+        "design-sync.figmaSourceType": "variable",
+        "design-sync.variableId": "VariableID:88751:15",
         "design-sync.modeId": "85894:0"
       }
     }
