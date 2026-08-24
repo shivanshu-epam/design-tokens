@@ -141282,7 +141282,7 @@
       "$type": "string",
       "$value": {
         "kind": "value",
-        "value": "Museo Sans"
+        "value": "Poppins"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
