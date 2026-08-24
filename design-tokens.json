@@ -44,7 +44,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#d9ac00"
+        "value": "#edbe02"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "style"
@@ -141282,7 +141282,7 @@
       "$type": "string",
       "$value": {
         "kind": "value",
-        "value": "Poppins"
+        "value": "Museo Sans"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
