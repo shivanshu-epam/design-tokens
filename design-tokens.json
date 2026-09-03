@@ -84,7 +84,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#ffcca7"
+        "value": "#ffc294"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "style"
