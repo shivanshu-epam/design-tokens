@@ -3064,7 +3064,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#000000"
+        "value": "#edadc8"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
