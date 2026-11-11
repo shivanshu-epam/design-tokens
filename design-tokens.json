@@ -124,7 +124,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#fef6fa"
+        "value": "#fff7fb"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "style"
@@ -414,7 +414,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#0b6f6f"
+        "value": "#000000"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "style"
@@ -4684,7 +4684,7 @@
       "$type": "color",
       "$value": {
         "kind": "value",
-        "value": "#0b6f6f"
+        "value": "#000000"
       },
       "$extensions": {
         "design-sync.figmaSourceType": "variable",
